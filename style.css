@@ -13,5 +13,9 @@ body{
     background-image: url();
     background-size: cover;
     background-position: center;
+
+}
+.container{
+    padding: 10px 10;
     
 }
