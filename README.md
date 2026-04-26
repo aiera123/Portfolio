@@ -119,12 +119,7 @@ You can deploy this project easily using:
 * 💻 GitHub: https://github.com/aiera123
 ---
 
-## 💡 Future Improvements
 
-* Convert into React.js portfolio
-* Add backend for contact form
-* Improve accessibility (ARIA roles)
-* Add real project case studies
 
 
 ## ❤️ Acknowledgement
