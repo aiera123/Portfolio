@@ -35,6 +35,7 @@ I am currently seeking:
 * SEO Fundamentals
 * UI/UX Principles
 * Manual QA Testing
+* SEO
 
 ---
 
