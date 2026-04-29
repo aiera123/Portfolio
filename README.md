@@ -2,10 +2,6 @@
 
 A modern, responsive personal portfolio website showcasing my skills, projects, and career goals as an aspiring Software Engineer.
 
----
-
-## 🚀 Live Demo
-
 ## 👩‍💻 About Me
 
 Hi, I'm **Anuradha Dulal**, a BCA final-year student based in Kathmandu, Nepal.
