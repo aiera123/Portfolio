@@ -55,6 +55,20 @@
 
       <a href="#contact" class="nav-cta">Hire Me</a>
 
+      <!--
+        Theme toggle button.
+        id="theme-toggle" matches initThemeToggle() in main.js.
+        aria-label is updated dynamically by JS.
+      -->
+      <button
+        id="theme-toggle"
+        class="theme-toggle"
+        aria-label="Switch to light mode"
+        title="Toggle light / dark theme"
+      >
+        🌙
+      </button>
+
       <button class="ham" id="ham" aria-label="Toggle navigation menu" aria-expanded="false">
         <span class="ham-line"></span>
         <span class="ham-line"></span>
@@ -118,8 +132,7 @@
 
             <div class="avatar-wrap">
               <div class="avatar-inner">
-                 <img src="images/profile.png.avif" alt="Anuradha Dulal" class="avatar-img">
-              <!-- <span class="avatar-initials">AD</?span> -->
+                <img src="images/profile.png.avif" alt="Anuradha Dulal" class="avatar-img" />
               </div>
             </div>
 
@@ -211,7 +224,8 @@
             at a time.
           </p>
           <p>
-            Beyond the screen,I also maintain a personal blog where I explore storytelling and audience engagement through writing <strong>blogging</strong>.
+            Beyond the screen, I write about tech, explore SEO strategies, and document
+            my learning journey through <strong>blogging</strong>.
           </p>
 
           <div class="interest-wrap" aria-label="Areas of interest">
@@ -323,7 +337,7 @@
           <div class="skill-item">
             <div class="skill-meta">
               <span class="skill-name-text">REST API Basics</span>
-              <span class="skill-pct-text">40%</span>
+              <span class="skill-pct-text">55%</span>
             </div>
             <div class="bar-track">
               <div class="bar-fill" data-w="55" role="progressbar" aria-valuenow="55" aria-valuemin="0" aria-valuemax="100"></div>
@@ -398,9 +412,9 @@
           <span class="label">Portfolio</span>
           <h2 class="heading">Featured <em>Projects</em></h2>
         </div>
-        <!-- <p class="subheading sr sr-right">
+        <p class="subheading sr sr-right">
           A selection of work built with care and intentionality.
-        </?p> -->
+        </p>
       </div>
 
       <div class="projects-grid">
@@ -424,7 +438,7 @@
               purchase records, and generates supplier reports for a local pharmacy.
             </p>
             <div class="p-links">
-              <a href="https://github.com/aiera123/Pharmacy-inventory-Management" class="p-link"><i class="fa-brands fa-github" aria-hidden="true"></i> Github</a>
+              <a href="#" class="p-link"><i class="fa-brands fa-github" aria-hidden="true"></i> GitHub</a>
               <a href="#" class="p-link"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo</a>
             </div>
           </div>
@@ -436,20 +450,20 @@
             <div class="p-thumb-bg" aria-hidden="true"></div>
             <i class="fa-solid fa-blog p-thumb-icon" aria-hidden="true"></i>
             <div class="p-tags" aria-label="Technologies used">
-              <!-- <span class="p-tag">HTML</span>
+              <span class="p-tag">HTML</span>
               <span class="p-tag">CSS</span>
-              <span class="p-tag">JS</span> -->
+              <span class="p-tag">JS</span>
             </div>
           </div>
           <div class="p-body">
-            <h3 class="p-title">Personal Blog</h3>
+            <h3 class="p-title">Personal Tech Blog</h3>
             <p class="p-desc">
-             A content-focused blog where I publish articles on life experiences and storytelling & Built with focus on readability, layout, and user engagement
-Demonstrates consistency, writing skills, and understanding of audience behavior.
+              An SEO-optimised static blog platform for tech tutorials and insights,
+              with structured article markup, dark mode toggle, and fast load times.
             </p>
             <div class="p-links">
-              <a href="https://github.com/aiera123/Blogsites" class="p-link"><i class="fa-brands fa-github" aria-hidden="true"></i> GitHub</a>
-              <a href="https://www.theinfiniteinfo.com/profile/aieraunfolded" class="p-link"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo</a>
+              <a href="#" class="p-link"><i class="fa-brands fa-github" aria-hidden="true"></i> GitHub</a>
+              <a href="#" class="p-link"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo</a>
             </div>
           </div>
         </article>
@@ -465,20 +479,20 @@ Demonstrates consistency, writing skills, and understanding of audience behavior
             </div>
           </div>
           <div class="p-body">
-            <h3 class="p-title">Todo-List App</h3>
+            <h3 class="p-title">Task Manager App</h3>
             <p class="p-desc">
               React productivity app with Kanban boards, drag-and-drop, priority labels,
               and localStorage persistence — built as a React learning milestone.
             </p>
             <div class="p-links">
-              <a href="#https://github.com/aiera123/Todo-App" class="p-link"><i class="fa-brands fa-github" aria-hidden="true"></i> GitHub</a>
+              <a href="#" class="p-link"><i class="fa-brands fa-github" aria-hidden="true"></i> GitHub</a>
               <a href="#" class="p-link"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo</a>
             </div>
           </div>
         </article>
 
         <!-- Project 4: Student Result Portal -->
-        <!-- <article class="project-card glass p4 sr sr-d3">
+        <article class="project-card glass p4 sr sr-d3">
           <div class="p-thumb">
             <div class="p-thumb-bg" aria-hidden="true"></div>
             <i class="fa-solid fa-graduation-cap p-thumb-icon" aria-hidden="true"></i>
@@ -498,7 +512,7 @@ Demonstrates consistency, writing skills, and understanding of audience behavior
               <a href="#" class="p-link"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo</a>
             </div>
           </div>
-        </article> -->
+        </article>
 
       </div>
     </div>
@@ -650,10 +664,10 @@ Demonstrates consistency, writing skills, and understanding of audience behavior
           </ul>
 
           <div class="socials" aria-label="Social media links">
-            <a href="#" class="s-btn" aria-label="GitHub">
+            <a href="https://github.com/aiera123" class="s-btn" aria-label="GitHub">
               <i class="fa-brands fa-github" aria-hidden="true"></i>
             </a>
-            <a href="#" class="s-btn" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/anuradha-dulal-2a2a2a28a/" class="s-btn" aria-label="LinkedIn">
               <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
             </a>
             <a href="#" class="s-btn" aria-label="Twitter / X">
@@ -717,10 +731,10 @@ Demonstrates consistency, writing skills, and understanding of audience behavior
       </p>
 
       <div class="socials footer-socials" aria-label="Social media links">
-        <a href="#" class="s-btn" aria-label="GitHub">
+        <a href="https://github.com/aiera123" class="s-btn" aria-label="GitHub">
           <i class="fa-brands fa-github" aria-hidden="true"></i>
         </a>
-        <a href="#" class="s-btn" aria-label="LinkedIn">
+        <a href="https://www.linkedin.com/in/anuradha-dulal-2a2a2a28a/" class="s-btn" aria-label="LinkedIn">
           <i class="fa-brands fa-linkedin-in" aria-hidden="true"></i>
         </a>
       </div>

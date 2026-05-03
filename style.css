@@ -1,31 +1,34 @@
 /* ============================================================
    style.css — Anuradha Dulal Portfolio
    Sections:
-     1. Design Tokens (CSS variables)
-     2. Reset & Base
-     3. Utility Classes
-     4. Custom Cursor
-     5. Background Effects (Noise + Orbs)
-     6. Layout Helpers
-     7. Glass Effect
-     8. Typography System
-     9. Scroll Reveal Animations
-    10. Buttons
-    11. Navbar
-    12. Mobile Drawer
-    13. Hero Section
-    14. About Section
-    15. Skills Section
-    16. Projects Section
-    17. Career Section
-    18. Contact Section
-    19. Footer
-    20. Responsive Breakpoints
+     1.  Design Tokens  — dark (default) + light overrides
+     2.  Reset & Base
+     3.  Smooth Theme Transition
+     4.  Utility Classes
+     5.  Custom Cursor
+     6.  Background Effects (Noise + Orbs)
+     7.  Layout Helpers
+     8.  Glass Effect
+     9.  Typography System
+    10.  Scroll Reveal Animations
+    11.  Buttons
+    12.  Theme Toggle Button  ← NEW
+    13.  Navbar
+    14.  Mobile Drawer
+    15.  Hero Section
+    16.  About Section
+    17.  Skills Section
+    18.  Projects Section
+    19.  Career Section
+    20.  Contact Section
+    21.  Footer
+    22.  Responsive Breakpoints
    ============================================================ */
 
 
 /* ── 1. Design Tokens ──────────────────────────────────────── */
 
+/* 🌙 DARK THEME — default (:root) */
 :root {
   /* Backgrounds */
   --bg:         #0d0f14;
@@ -55,13 +58,43 @@
   --font-display: 'Playfair Display', Georgia, serif;
   --font-body:    'Plus Jakarta Sans', sans-serif;
 
-  /* Spacing & shape */
-  --radius:     16px;
-  --radius-lg:  24px;
+  /* Shape */
+  --radius:    16px;
+  --radius-lg: 24px;
 
-  /* Animation */
-  --ease:       cubic-bezier(0.4, 0, 0.2, 1);
-  --duration:   0.4s;
+  /* Motion */
+  --ease:     cubic-bezier(0.4, 0, 0.2, 1);
+  --duration: 0.4s;
+
+  /* Navbar stuck background — used as a variable so light mode can override */
+  --nav-stuck-bg: rgba(13, 15, 20, 0.80);
+
+  /* Drawer background */
+  --drawer-bg: rgba(13, 15, 20, 0.96);
+}
+
+/* ☀️ LIGHT THEME — applied when body has class "light" */
+body.light {
+  --bg:         #f7f7fb;
+  --bg-alt:     #ffffff;
+
+  --surface:    rgba(0, 0, 0, 0.04);
+  --surface-hi: rgba(0, 0, 0, 0.06);
+
+  --border:     rgba(0, 0, 0, 0.08);
+  --border-hi:  rgba(0, 0, 0, 0.15);
+
+  --rose:       #7c3aed;
+  --rose-light: #a78bfa;
+  --rose-dark:  #5b21b6;
+
+  --text:       #1a1a1a;
+  --text-2:     #555555;
+  --text-3:     #888888;
+
+  /* Override navbar/drawer backgrounds for light mode */
+  --nav-stuck-bg: rgba(247, 247, 251, 0.88);
+  --drawer-bg:    rgba(247, 247, 251, 0.97);
 }
 
 
@@ -89,14 +122,74 @@ body {
   cursor:      none; /* replaced by custom cursor */
 }
 
-a        { color: inherit; text-decoration: none; }
-img      { max-width: 100%; display: block; }
-button   { cursor: none; }
+a      { color: inherit; text-decoration: none; }
+img    { max-width: 100%; display: block; }
+button { cursor: none; }
 
 
-/* ── 3. Utility Classes ────────────────────────────────────── */
+/* ── 3. Smooth Theme Transition ────────────────────────────── */
+/*
+   Applied to body and key surfaces so switching themes feels
+   like a gentle fade rather than an instant snap.
+   Only background / color / border properties are transitioned
+   to avoid accidentally slowing down hover effects or animations.
+*/
+body,
+body * {
+  transition:
+    background-color 0.35s var(--ease),
+    color            0.35s var(--ease),
+    border-color     0.35s var(--ease),
+    box-shadow       0.35s var(--ease);
+}
 
-/* Centred, max-width wrapper */
+/*
+   Carve out elements that have their own intentional transitions
+   so the global rule above doesn't interfere with them.
+*/
+.btn,
+.sr, .sr-left, .sr-right,
+.bar-fill,
+.avatar-wrap, .avatar-inner,
+.orb,
+.scroll-track::after,
+.hero-badge,
+.hero-name,
+.hero-desc,
+.hero-actions,
+.hero-card-wrap,
+.chip {
+  transition: unset;
+}
+
+/* Re-apply their original transitions after the unset */
+.btn {
+  transition:
+    transform    var(--duration) var(--ease),
+    box-shadow   var(--duration) var(--ease),
+    background-color 0.35s var(--ease),
+    color            0.35s var(--ease),
+    border-color     0.35s var(--ease);
+}
+
+.sr, .sr-left, .sr-right {
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+}
+
+.bar-fill {
+  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chip {
+  transition:
+    background-color var(--duration),
+    border-color     var(--duration),
+    color            var(--duration);
+}
+
+
+/* ── 4. Utility Classes ────────────────────────────────────── */
+
 .container {
   width:    min(1160px, 92%);
   margin:   0 auto;
@@ -104,18 +197,13 @@ button   { cursor: none; }
   z-index:  2;
 }
 
-/* Default section rhythm */
-section {
-  padding: 120px 0;
-}
+section { padding: 120px 0; }
 
-/* Thin horizontal rule between sections */
 .section-line {
   height:     1px;
   background: linear-gradient(90deg, transparent, var(--border), transparent);
 }
 
-/* Centred section header block (used by skills / career / contact) */
 .section-header {
   text-align:    center;
   margin-bottom: 72px;
@@ -126,7 +214,7 @@ section {
 }
 
 
-/* ── 4. Custom Cursor ──────────────────────────────────────── */
+/* ── 5. Custom Cursor ──────────────────────────────────────── */
 
 #cursor-dot,
 #cursor-ring {
@@ -152,11 +240,9 @@ section {
   border:       1.5px solid rgba(232, 144, 122, 0.5);
   top:  0;
   left: 0;
-  /* separate transition so ring lags behind the dot */
   transition: width 0.25s, height 0.25s, border-color 0.25s;
 }
 
-/* Scale up the ring when hovering interactive elements */
 .cursor-grow #cursor-ring {
   width:        56px;
   height:       56px;
@@ -164,9 +250,8 @@ section {
 }
 
 
-/* ── 5. Background Effects ─────────────────────────────────── */
+/* ── 6. Background Effects ─────────────────────────────────── */
 
-/* Grain / noise texture overlay on the whole page */
 body::before {
   content:          '';
   position:         fixed;
@@ -175,9 +260,13 @@ body::before {
   opacity:          0.025;
   pointer-events:   none;
   z-index:          1;
+  /* Exclude from the global theme transition */
+  transition:       none;
 }
 
-/* Blurred gradient orbs — purely decorative */
+/* Dim the noise slightly in light mode so it's less noticeable */
+body.light::before { opacity: 0.015; }
+
 .orb {
   position:       fixed;
   border-radius:  50%;
@@ -185,45 +274,50 @@ body::before {
   pointer-events: none;
   z-index:        0;
   animation:      orbFloat 18s ease-in-out infinite;
+  transition:     none; /* orbs must not be affected by theme transition */
 }
 
 .orb-1 {
-  width:            600px;
-  height:           600px;
-  top:              -200px;
-  right:            -150px;
-  background:       radial-gradient(circle, rgba(232, 144, 122, 0.12), transparent 70%);
-  animation-delay:  0s;
+  width:           600px;
+  height:          600px;
+  top:             -200px;
+  right:           -150px;
+  background:      radial-gradient(circle, rgba(232, 144, 122, 0.12), transparent 70%);
+  animation-delay: 0s;
 }
 
 .orb-2 {
-  width:            500px;
-  height:           500px;
-  bottom:           -150px;
-  left:             -100px;
-  background:       radial-gradient(circle, rgba(127, 169, 140, 0.10), transparent 70%);
-  animation-delay:  -6s;
+  width:           500px;
+  height:          500px;
+  bottom:          -150px;
+  left:            -100px;
+  background:      radial-gradient(circle, rgba(127, 169, 140, 0.10), transparent 70%);
+  animation-delay: -6s;
 }
 
 .orb-3 {
-  width:            400px;
-  height:           400px;
-  top:              40%;
-  left:             40%;
-  background:       radial-gradient(circle, rgba(212, 168, 90, 0.07), transparent 70%);
-  animation-delay:  -12s;
+  width:           400px;
+  height:          400px;
+  top:             40%;
+  left:            40%;
+  background:      radial-gradient(circle, rgba(212, 168, 90, 0.07), transparent 70%);
+  animation-delay: -12s;
 }
 
+/* Tone orbs down in light mode */
+body.light .orb-1 { background: radial-gradient(circle, rgba(124, 58, 237, 0.08), transparent 70%); }
+body.light .orb-2 { background: radial-gradient(circle, rgba(91,  63, 248, 0.06), transparent 70%); }
+body.light .orb-3 { background: radial-gradient(circle, rgba(212, 168, 90, 0.05), transparent 70%); }
+
 @keyframes orbFloat {
-  0%, 100% { transform: translate(0,    0)    scale(1);    }
+  0%, 100% { transform: translate(0,     0)    scale(1);    }
   33%       { transform: translate(30px, -40px) scale(1.05); }
   66%       { transform: translate(-20px, 30px) scale(0.95); }
 }
 
 
-/* ── 6. Glass Effect ───────────────────────────────────────── */
+/* ── 7. Glass Effect ───────────────────────────────────────── */
 
-/* Standard frosted-glass card */
 .glass {
   background:             var(--surface);
   border:                 1px solid var(--border);
@@ -232,7 +326,6 @@ body::before {
   border-radius:          var(--radius-lg);
 }
 
-/* Higher-opacity variant for the hero card */
 .glass-hi {
   background:             var(--surface-hi);
   border:                 1px solid var(--border-hi);
@@ -242,9 +335,8 @@ body::before {
 }
 
 
-/* ── 7. Typography System ──────────────────────────────────── */
+/* ── 8. Typography System ──────────────────────────────────── */
 
-/* Small uppercase label with a leading line */
 .label {
   display:        inline-flex;
   align-items:    center;
@@ -265,7 +357,6 @@ body::before {
   background: var(--rose);
 }
 
-/* Section heading — uses display font */
 .heading {
   font-family:   var(--font-display);
   font-size:     clamp(2rem, 4vw, 3.2rem);
@@ -280,7 +371,6 @@ body::before {
   color:      var(--rose);
 }
 
-/* Body-sized supporting text beneath headings */
 .subheading {
   font-size:   1rem;
   color:       var(--text-2);
@@ -288,7 +378,6 @@ body::before {
   line-height: 1.8;
 }
 
-/* Decorative gradient divider */
 .rule {
   width:      40px;
   height:     1px;
@@ -298,21 +387,19 @@ body::before {
 }
 
 
-/* ── 8. Scroll Reveal Animations ───────────────────────────── */
+/* ── 9. Scroll Reveal Animations ───────────────────────────── */
 
-/* All three directions start hidden; JS adds .up to reveal */
 .sr,
 .sr-left,
 .sr-right {
-  opacity:    0;
-  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+  opacity: 0;
+  /* transition declared in section 3 to avoid conflicts */
 }
 
 .sr      { transform: translateY(40px);  }
 .sr-left { transform: translateX(-40px); }
 .sr-right{ transform: translateX(40px);  }
 
-/* Revealed state */
 .sr.up,
 .sr-left.up,
 .sr-right.up {
@@ -320,33 +407,29 @@ body::before {
   transform: translate(0, 0);
 }
 
-/* Optional stagger helpers applied alongside .sr */
 .sr-d1 { transition-delay: 0.1s; }
 .sr-d2 { transition-delay: 0.2s; }
 .sr-d3 { transition-delay: 0.3s; }
 
 
-/* ── 9. Buttons ────────────────────────────────────────────── */
+/* ── 10. Buttons ────────────────────────────────────────────── */
 
 .btn {
-  display:         inline-flex;
-  align-items:     center;
-  gap:             10px;
-  padding:         14px 32px;
-  border-radius:   100px;
-  font-family:     var(--font-body);
-  font-size:       0.88rem;
-  font-weight:     500;
-  letter-spacing:  0.04em;
-  cursor:          none;
-  border:          none;
-  position:        relative;
-  overflow:        hidden;
-  transition:      transform var(--duration) var(--ease),
-                   box-shadow var(--duration) var(--ease);
+  display:        inline-flex;
+  align-items:    center;
+  gap:            10px;
+  padding:        14px 32px;
+  border-radius:  100px;
+  font-family:    var(--font-body);
+  font-size:      0.88rem;
+  font-weight:    500;
+  letter-spacing: 0.04em;
+  cursor:         none;
+  border:         none;
+  position:       relative;
+  overflow:       hidden;
 }
 
-/* Shine overlay on hover */
 .btn::after {
   content:    '';
   position:   absolute;
@@ -356,26 +439,22 @@ body::before {
   transition: opacity 0.3s;
 }
 
-.btn:hover::after  { opacity:    1; }
-.btn:hover         { transform:  translateY(-3px); }
+.btn:hover::after { opacity:   1; }
+.btn:hover        { transform: translateY(-3px); }
 
-/* Filled rose gradient */
 .btn-primary {
   background:  linear-gradient(135deg, var(--rose), var(--rose-dark));
   color:       #fff;
   box-shadow:  0 8px 32px rgba(232, 144, 122, 0.3);
 }
 
-.btn-primary:hover {
-  box-shadow: 0 16px 48px rgba(232, 144, 122, 0.45);
-}
+.btn-primary:hover { box-shadow: 0 16px 48px rgba(232, 144, 122, 0.45); }
 
-/* Transparent with border */
 .btn-ghost {
-  background:  var(--surface);
-  color:       var(--text);
-  border:      1px solid var(--border-hi);
-  box-shadow:  0 4px 20px rgba(0, 0, 0, 0.3);
+  background: var(--surface);
+  color:      var(--text);
+  border:     1px solid var(--border-hi);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .btn-ghost:hover {
@@ -384,7 +463,60 @@ body::before {
 }
 
 
-/* ── 10. Navbar ─────────────────────────────────────────────── */
+/* ── 11. Theme Toggle Button ────────────────────────────────── */
+/*
+   Sits in the navbar between the "Hire Me" CTA and the hamburger.
+   Shows the OPPOSITE of the current theme (so in dark mode it shows 🌙,
+   hinting "click to go light", and vice-versa).
+*/
+.theme-toggle {
+  /* Reset button defaults */
+  background:  none;
+  border:      1px solid var(--border-hi);
+  cursor:      none;
+  font-size:   1.1rem;
+  line-height: 1;
+
+  /* Layout */
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  width:           38px;
+  height:          38px;
+  border-radius:   50%;
+  padding:         0;
+  flex-shrink:     0;
+
+  /* Theming */
+  color:      var(--text-2);
+
+  /* Hover animation — intentionally NOT covered by the global transition */
+  transition:
+    background-color var(--duration) var(--ease),
+    border-color     var(--duration) var(--ease),
+    transform        var(--duration) var(--ease),
+    box-shadow       var(--duration) var(--ease);
+}
+
+.theme-toggle:hover {
+  background-color: var(--rose);
+  border-color:     var(--rose);
+  color:            #fff;
+  transform:        rotate(20deg) scale(1.1);
+  box-shadow:       0 4px 16px rgba(232, 144, 122, 0.40);
+}
+
+/* Slightly tighter on mobile */
+@media (max-width: 640px) {
+  .theme-toggle {
+    width:     34px;
+    height:    34px;
+    font-size: 1rem;
+  }
+}
+
+
+/* ── 12. Navbar ─────────────────────────────────────────────── */
 
 #nav {
   position:   fixed;
@@ -393,15 +525,14 @@ body::before {
   right:      0;
   z-index:    100;
   padding:    22px 0;
-  transition: padding var(--duration),
-              background var(--duration),
-              box-shadow var(--duration);
+  /* Only transition the layout properties, not color
+     (color is handled by the global theme transition) */
+  transition: padding var(--duration), box-shadow var(--duration);
 }
 
-/* Frosted glass effect once user scrolls */
 #nav.stuck {
   padding:                 14px 0;
-  background:              rgba(13, 15, 20, 0.70);
+  background:              var(--nav-stuck-bg);   /* ← uses the CSS variable */
   backdrop-filter:         blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow:              0 1px 0 var(--border);
@@ -411,6 +542,7 @@ body::before {
   display:         flex;
   align-items:     center;
   justify-content: space-between;
+  gap:             16px;
 }
 
 .nav-logo {
@@ -422,8 +554,8 @@ body::before {
 }
 
 .nav-logo span {
-  color:       var(--rose);
-  font-style:  italic;
+  color:      var(--rose);
+  font-style: italic;
 }
 
 .nav-links {
@@ -440,10 +572,8 @@ body::before {
   text-transform: uppercase;
   color:          var(--text-2);
   position:       relative;
-  transition:     color var(--duration);
 }
 
-/* Underline slide-in on hover */
 .nav-links a::after {
   content:    '';
   position:   absolute;
@@ -458,7 +588,6 @@ body::before {
 .nav-links a:hover         { color: var(--text); }
 .nav-links a:hover::after  { width: 100%; }
 
-/* "Hire Me" pill in the nav */
 .nav-cta {
   padding:        9px 22px;
   border-radius:  100px;
@@ -469,7 +598,6 @@ body::before {
   font-size:      0.78rem;
   font-weight:    500;
   letter-spacing: 0.06em;
-  transition:     background var(--duration), color var(--duration), border-color var(--duration);
 }
 
 .nav-cta:hover {
@@ -478,41 +606,39 @@ body::before {
   border-color: var(--rose);
 }
 
-/* Hamburger button (shown only on mobile) */
 .ham {
-  display:         none;
-  flex-direction:  column;
-  gap:             6px;
-  background:      none;
-  border:          none;
-  padding:         4px;
-  cursor:          pointer;
+  display:        none;
+  flex-direction: column;
+  gap:            6px;
+  background:     none;
+  border:         none;
+  padding:        4px;
+  cursor:         pointer;
 }
 
 .ham-line {
-  display:           block;
-  width:             26px;
-  height:            1.5px;
-  background:        var(--text);
-  border-radius:     2px;
-  transition:        var(--duration) var(--ease);
-  transform-origin:  center;
+  display:          block;
+  width:            26px;
+  height:           1.5px;
+  background:       var(--text);
+  border-radius:    2px;
+  transition:       var(--duration) var(--ease);
+  transform-origin: center;
 }
 
-/* Animate lines into an ✕ when open */
-.ham.open .ham-line:nth-child(1) { transform: translateY(7.5px) rotate(45deg);  }
+.ham.open .ham-line:nth-child(1) { transform: translateY(7.5px) rotate(45deg);   }
 .ham.open .ham-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
 .ham.open .ham-line:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
 
 
-/* ── 11. Mobile Drawer ──────────────────────────────────────── */
+/* ── 13. Mobile Drawer ──────────────────────────────────────── */
 
 .drawer {
-  display:         none; /* shown via .open class */
+  display:         none;
   position:        fixed;
   inset:           0;
   z-index:         99;
-  background:      rgba(13, 15, 20, 0.96);
+  background:      var(--drawer-bg);   /* ← uses the CSS variable */
   backdrop-filter: blur(24px);
   flex-direction:  column;
   align-items:     center;
@@ -533,19 +659,18 @@ body::before {
 .drawer a:hover { color: var(--rose); }
 
 
-/* ── 12. Hero Section ───────────────────────────────────────── */
+/* ── 14. Hero Section ───────────────────────────────────────── */
 
 #hero {
-  min-height:  100svh;
-  display:     flex;
-  align-items: center;
-  padding-top: 100px;
+  min-height:     100svh;
+  display:        flex;
+  align-items:    center;
+  padding-top:    100px;
   padding-bottom: 80px;
-  position:    relative;
-  overflow:    hidden;
+  position:       relative;
+  overflow:       hidden;
 }
 
-/* Large ghosted watermark behind the content */
 .hero-watermark {
   position:       absolute;
   right:          -2%;
@@ -561,6 +686,11 @@ body::before {
   white-space:    nowrap;
 }
 
+/* Adjust watermark opacity for light mode */
+body.light .hero-watermark {
+  color: rgba(0, 0, 0, 0.04);
+}
+
 .hero-grid {
   display:               grid;
   grid-template-columns: 1fr 420px;
@@ -568,7 +698,6 @@ body::before {
   align-items:           center;
 }
 
-/* "Open to Opportunities" pill */
 .hero-badge {
   display:        inline-flex;
   align-items:    center;
@@ -595,7 +724,7 @@ body::before {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1);   }
+  0%, 100% { opacity: 1;   transform: scale(1);   }
   50%       { opacity: 0.5; transform: scale(0.7); }
 }
 
@@ -610,19 +739,19 @@ body::before {
 }
 
 .hero-name .line2 {
-  display:     block;
-  font-style:  italic;
-  color:       var(--rose);
-  font-size:   clamp(3.6rem, 7.5vw, 6.5rem);
+  display:    block;
+  font-style: italic;
+  color:      var(--rose);
+  font-size:  clamp(3.6rem, 7.5vw, 6.5rem);
 }
 
 .hero-desc {
-  font-size:    1.02rem;
-  color:        var(--text-2);
-  max-width:    460px;
-  line-height:  1.85;
+  font-size:     1.02rem;
+  color:         var(--text-2);
+  max-width:     460px;
+  line-height:   1.85;
   margin-bottom: 40px;
-  animation:    fadeDown 0.7s 0.16s var(--ease) both;
+  animation:     fadeDown 0.7s 0.16s var(--ease) both;
 }
 
 .hero-actions {
@@ -632,10 +761,7 @@ body::before {
   animation: fadeDown 0.7s 0.24s var(--ease) both;
 }
 
-/* Right column: identity card */
-.hero-card-wrap {
-  animation: fadeLeft 0.8s 0.2s var(--ease) both;
-}
+.hero-card-wrap { animation: fadeLeft 0.8s 0.2s var(--ease) both; }
 
 .hero-card {
   padding:    40px 36px;
@@ -644,7 +770,6 @@ body::before {
   text-align: center;
 }
 
-/* Subtle inner gradient overlay */
 .hero-card::before {
   content:    '';
   position:   absolute;
@@ -656,7 +781,6 @@ body::before {
   pointer-events: none;
 }
 
-/* Spinning gradient ring around the avatar */
 .avatar-wrap {
   width:         130px;
   height:        130px;
@@ -665,6 +789,8 @@ body::before {
   background:    linear-gradient(135deg, var(--rose), var(--sage));
   padding:       2px;
   animation:     spin 12s linear infinite;
+  /* Exclude from theme transition */
+  transition: none;
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -677,22 +803,15 @@ body::before {
   display:         flex;
   align-items:     center;
   justify-content: center;
-  /* counter-rotate so initials stay upright */
   animation:       spin 12s linear infinite reverse;
-  overflow: hidden;
+  overflow:        hidden;
+  transition:      none;
 }
-/* 
-.avatar-initials {
-  font-family: var(--font-display);
-  font-size:   2.6rem;
-  font-weight: 400;
-  color:       var(--rose);
-  line-height: 1;
-} */
- .avatar-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+
+.avatar-img {
+  width:         100%;
+  height:        100%;
+  object-fit:    cover;
   border-radius: 50%;
 }
 
@@ -711,7 +830,6 @@ body::before {
   margin-bottom:  28px;
 }
 
-/* 2-column grid of technology chips */
 .chip-grid {
   display:               grid;
   grid-template-columns: 1fr 1fr;
@@ -729,9 +847,11 @@ body::before {
   display:       flex;
   align-items:   center;
   gap:           7px;
-  transition:    background var(--duration),
-                 border-color var(--duration),
-                 color var(--duration);
+}
+
+/* In light mode chips need a slightly darker base to read well */
+body.light .chip {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .chip:hover {
@@ -745,17 +865,16 @@ body::before {
   font-size: 0.8rem;
 }
 
-/* "Available for internship" indicator */
 .avail {
-  display:        flex;
-  align-items:    center;
+  display:         flex;
+  align-items:     center;
   justify-content: center;
-  gap:            8px;
-  margin-top:     24px;
-  font-size:      0.76rem;
-  color:          var(--text-3);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  gap:             8px;
+  margin-top:      24px;
+  font-size:       0.76rem;
+  color:           var(--text-3);
+  letter-spacing:  0.06em;
+  text-transform:  uppercase;
 }
 
 .avail-dot {
@@ -767,7 +886,6 @@ body::before {
   animation:     pulse 2s ease infinite;
 }
 
-/* Animated scroll indicator at the bottom of the hero */
 .scroll-cue {
   position:       absolute;
   bottom:         36px;
@@ -801,11 +919,11 @@ body::before {
   height:     50px;
   background: linear-gradient(transparent, var(--rose));
   animation:  scrollDrop 2s ease infinite;
+  transition: none;
 }
 
 @keyframes scrollDrop { to { top: 100px; } }
 
-/* Hero entrance keyframes */
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-28px); }
   to   { opacity: 1; transform: translateY(0);     }
@@ -817,7 +935,7 @@ body::before {
 }
 
 
-/* ── 13. About Section ──────────────────────────────────────── */
+/* ── 15. About Section ──────────────────────────────────────── */
 
 #about {
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
@@ -830,10 +948,8 @@ body::before {
   align-items:           center;
 }
 
-/* Left column: identity card */
 .about-left { position: relative; }
 
-/* Oversized decorative quotation mark */
 .big-quote {
   position:       absolute;
   top:            -40px;
@@ -900,8 +1016,9 @@ body::before {
   border-radius: var(--radius);
   padding:       18px 12px;
   text-align:    center;
-  transition:    background var(--duration), border-color var(--duration);
 }
+
+body.light .stat-box { background: rgba(0, 0, 0, 0.03); }
 
 .stat-box:hover {
   background:   rgba(232, 144, 122, 0.08);
@@ -923,11 +1040,10 @@ body::before {
   margin-top:     4px;
 }
 
-/* Right column: text content */
 .about-body p {
-  font-size:    0.97rem;
-  color:        var(--text-2);
-  line-height:  1.9;
+  font-size:     0.97rem;
+  color:         var(--text-2);
+  line-height:   1.9;
   margin-bottom: 18px;
 }
 
@@ -937,22 +1053,23 @@ body::before {
 }
 
 .interest-wrap {
-  display:   flex;
-  flex-wrap: wrap;
-  gap:       10px;
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        10px;
   margin-top: 32px;
 }
 
 .interest {
-  background:    rgba(255, 255, 255, 0.04);
-  border:        1px solid var(--border);
-  border-radius: 100px;
-  padding:       7px 18px;
-  font-size:     0.78rem;
-  color:         var(--text-2);
+  background:     rgba(255, 255, 255, 0.04);
+  border:         1px solid var(--border);
+  border-radius:  100px;
+  padding:        7px 18px;
+  font-size:      0.78rem;
+  color:          var(--text-2);
   letter-spacing: 0.04em;
-  transition:    background var(--duration), border-color var(--duration), color var(--duration);
 }
+
+body.light .interest { background: rgba(0, 0, 0, 0.04); }
 
 .interest:hover {
   background:   rgba(232, 144, 122, 0.10);
@@ -961,7 +1078,7 @@ body::before {
 }
 
 
-/* ── 14. Skills Section ─────────────────────────────────────── */
+/* ── 16. Skills Section ─────────────────────────────────────── */
 
 #skills { background: var(--bg); }
 
@@ -975,11 +1092,8 @@ body::before {
   padding:    32px 28px;
   position:   relative;
   overflow:   hidden;
-  transition: transform var(--duration) var(--ease),
-              box-shadow var(--duration);
 }
 
-/* Rose glow overlay revealed on hover */
 .skill-card::before {
   content:    '';
   position:   absolute;
@@ -1046,17 +1160,17 @@ body::before {
   overflow:      hidden;
 }
 
-/* Width is set to 0 initially; JS animates it in when visible */
+body.light .bar-track { background: rgba(0, 0, 0, 0.08); }
+
 .bar-fill {
   height:        100%;
   border-radius: 10px;
   width:         0;
   background:    linear-gradient(90deg, var(--rose), var(--gold));
-  transition:    width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 
-/* ── 15. Projects Section ───────────────────────────────────── */
+/* ── 17. Projects Section ───────────────────────────────────── */
 
 #projects {
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
@@ -1080,11 +1194,9 @@ body::before {
 }
 
 .project-card {
-  overflow:        hidden;
-  display:         flex;
-  flex-direction:  column;
-  transition:      transform var(--duration) var(--ease),
-                   box-shadow var(--duration);
+  overflow:       hidden;
+  display:        flex;
+  flex-direction: column;
 }
 
 .project-card:hover {
@@ -1092,7 +1204,6 @@ body::before {
   box-shadow: 0 32px 80px rgba(0, 0, 0, 0.5);
 }
 
-/* Thumbnail area */
 .p-thumb {
   height:          200px;
   position:        relative;
@@ -1123,7 +1234,6 @@ body::before {
   transform: scale(1.1);
 }
 
-/* Per-card colour schemes */
 .p1 .p-thumb-bg { background: linear-gradient(135deg, #2a1a17, #4a2a20); }
 .p2 .p-thumb-bg { background: linear-gradient(135deg, #172120, #1e3830); }
 .p3 .p-thumb-bg { background: linear-gradient(135deg, #1a1730, #2a2245); }
@@ -1150,7 +1260,9 @@ body::before {
   backdrop-filter: blur(8px);
 }
 
-/* Project body */
+/* Tags are always dark so they read on dark thumbnails */
+.p-tag { color: rgba(255, 255, 255, 0.80); }
+
 .p-body {
   padding:        28px 26px;
   flex:           1;
@@ -1166,14 +1278,14 @@ body::before {
 }
 
 .p-desc {
-  font-size:    0.85rem;
-  color:        var(--text-2);
-  line-height:  1.75;
-  flex:         1;
+  font-size:     0.85rem;
+  color:         var(--text-2);
+  line-height:   1.75;
+  flex:          1;
   margin-bottom: 22px;
 }
 
-.p-links    { display: flex; gap: 18px; }
+.p-links { display: flex; gap: 18px; }
 
 .p-link {
   font-size:      0.78rem;
@@ -1183,13 +1295,11 @@ body::before {
   align-items:    center;
   gap:            6px;
   letter-spacing: 0.04em;
-  transition:     color var(--duration);
 }
 
-.p-link:hover  { color: var(--rose); }
-.p-link i      { font-size: 0.75rem; }
+.p-link:hover { color: var(--rose); }
+.p-link i     { font-size: 0.75rem; }
 
-/* "Featured" badge on the first card */
 .p-featured {
   position:       absolute;
   top:            14px;
@@ -1206,7 +1316,7 @@ body::before {
 }
 
 
-/* ── 16. Career Section ─────────────────────────────────────── */
+/* ── 18. Career Section ─────────────────────────────────────── */
 
 #career { background: var(--bg); }
 
@@ -1217,7 +1327,6 @@ body::before {
   align-items:           start;
 }
 
-/* Left: goal card */
 .career-main {
   padding:  56px 48px;
   position: relative;
@@ -1230,24 +1339,24 @@ body::before {
   inset:      0;
   background: linear-gradient(135deg,
     rgba(232, 144, 122, 0.14) 0%,
-    rgba(127, 169, 140,  0.07) 100%
+    rgba(127, 169, 140, 0.07) 100%
   );
   pointer-events: none;
 }
 
 .career-emoji {
-  font-size:    2.8rem;
+  font-size:     2.8rem;
   margin-bottom: 20px;
-  display:      block;
+  display:       block;
 }
 
 .career-main .heading   { font-size: clamp(1.6rem, 3vw, 2.4rem); }
 .career-main .subheading { font-size: 0.92rem; margin-bottom: 32px; }
 
 .open-to-wrap {
-  display:   flex;
-  flex-wrap: wrap;
-  gap:       10px;
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        10px;
   margin-top: 28px;
 }
 
@@ -1264,12 +1373,13 @@ body::before {
   gap:           6px;
 }
 
+body.light .open-tag { background: rgba(0, 0, 0, 0.04); }
+
 .open-tag i {
   color:     var(--rose);
   font-size: 0.75rem;
 }
 
-/* Right: vertical timeline */
 .timeline {
   display:        flex;
   flex-direction: column;
@@ -1284,7 +1394,6 @@ body::before {
 
 .tl-item:last-child { padding-bottom: 0; }
 
-/* Connecting line between dots */
 .tl-item::after {
   content:    '';
   position:   absolute;
@@ -1331,13 +1440,13 @@ body::before {
 }
 
 .tl-text {
-  font-size:  0.84rem;
-  color:      var(--text-2);
+  font-size:   0.84rem;
+  color:       var(--text-2);
   line-height: 1.7;
 }
 
 
-/* ── 17. Contact Section ────────────────────────────────────── */
+/* ── 19. Contact Section ────────────────────────────────────── */
 
 #contact {
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%);
@@ -1359,9 +1468,9 @@ body::before {
 }
 
 .contact-left p {
-  font-size:    0.95rem;
-  color:        var(--text-2);
-  line-height:  1.8;
+  font-size:     0.95rem;
+  color:         var(--text-2);
+  line-height:   1.8;
   margin-bottom: 40px;
 }
 
@@ -1392,17 +1501,15 @@ body::before {
 }
 
 .cd-text {
-  font-size:  0.9rem;
-  color:      var(--text-2);
-  transition: color var(--duration);
+  font-size: 0.9rem;
+  color:     var(--text-2);
 }
 
 .cd-text:hover { color: var(--rose); }
 
-/* Social icon row */
 .socials {
-  display:   flex;
-  gap:       12px;
+  display:    flex;
+  gap:        12px;
   margin-top: 32px;
 }
 
@@ -1417,10 +1524,6 @@ body::before {
   justify-content: center;
   color:           var(--text-2);
   font-size:       0.9rem;
-  transition:      background var(--duration) var(--ease),
-                   border-color var(--duration),
-                   color var(--duration),
-                   transform var(--duration);
 }
 
 .s-btn:hover {
@@ -1430,7 +1533,6 @@ body::before {
   transform:    translateY(-4px);
 }
 
-/* Contact form card */
 .contact-form { padding: 36px 32px; }
 
 .form-row { margin-bottom: 20px; }
@@ -1446,17 +1548,22 @@ body::before {
 }
 
 .form-ctrl {
-  width:       100%;
-  padding:     13px 16px;
-  background:  rgba(255, 255, 255, 0.04);
-  border:      1px solid var(--border);
+  width:         100%;
+  padding:       13px 16px;
+  /* Dark mode: white-tinted; light mode: black-tinted */
+  background:    rgba(255, 255, 255, 0.04);
+  border:        1px solid var(--border);
   border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size:   0.9rem;
-  color:       var(--text);
-  outline:     none;
-  resize:      none;
-  transition:  border-color var(--duration), background var(--duration);
+  font-family:   var(--font-body);
+  font-size:     0.9rem;
+  color:         var(--text);
+  outline:       none;
+  resize:        none;
+}
+
+/* Override for light mode — white input field */
+body.light .form-ctrl {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .form-ctrl:focus {
@@ -1474,7 +1581,6 @@ textarea.form-ctrl { min-height: 120px; }
   margin-top:      4px;
 }
 
-/* Success toast shown after form submit */
 .toast {
   display:       none;
   background:    rgba(74, 222, 128, 0.10);
@@ -1488,7 +1594,7 @@ textarea.form-ctrl { min-height: 120px; }
 }
 
 
-/* ── 18. Footer ─────────────────────────────────────────────── */
+/* ── 20. Footer ─────────────────────────────────────────────── */
 
 footer {
   border-top: 1px solid var(--border);
@@ -1525,7 +1631,6 @@ footer {
 
 .footer-copy a:hover { opacity: 0.75; }
 
-/* Smaller social buttons used in the footer */
 .footer-socials .s-btn {
   width:     34px;
   height:    34px;
@@ -1533,47 +1638,41 @@ footer {
 }
 
 
-/* ── 19. Responsive Breakpoints ─────────────────────────────── */
+/* ── 21. Responsive Breakpoints ─────────────────────────────── */
 
 /* Tablet — ≤960px */
 @media (max-width: 960px) {
-  /* Hero: stack vertically, hide right card */
-  .hero-grid             { grid-template-columns: 1fr; text-align: center; }
-  .hero-card-wrap        { display: none; }
-  .hero-desc             { margin: 0 auto 40px; }
-  .hero-actions          { justify-content: center; }
+  .hero-grid      { grid-template-columns: 1fr; text-align: center; }
+  .hero-card-wrap { display: none; }
+  .hero-desc      { margin: 0 auto 40px; }
+  .hero-actions   { justify-content: center; }
 
-  /* About: single column */
-  .about-grid            { grid-template-columns: 1fr; }
-  .about-left            { max-width: 400px; margin: 0 auto; }
+  .about-grid     { grid-template-columns: 1fr; }
+  .about-left     { max-width: 400px; margin: 0 auto; }
 
-  /* Skills: 2 columns */
-  .skills-grid           { grid-template-columns: 1fr 1fr; }
+  .skills-grid    { grid-template-columns: 1fr 1fr; }
 
-  /* Career / Contact: single column */
-  .career-grid           { grid-template-columns: 1fr; }
-  .contact-grid          { grid-template-columns: 1fr; }
+  .career-grid    { grid-template-columns: 1fr; }
+  .contact-grid   { grid-template-columns: 1fr; }
 
-  /* Projects: keep 2 columns */
-  .projects-grid         { grid-template-columns: 1fr 1fr; }
+  .projects-grid  { grid-template-columns: 1fr 1fr; }
 
-  /* Nav: hide links, show hamburger */
-  .nav-links             { display: none; }
-  .ham                   { display: flex; }
-  .nav-cta               { display: none; }
+  .nav-links      { display: none; }
+  .ham            { display: flex; }
+  .nav-cta        { display: none; }
 }
 
 /* Mobile — ≤640px */
 @media (max-width: 640px) {
-  section                { padding: 80px 0; }
-  .projects-grid         { grid-template-columns: 1fr; }
-  .skills-grid           { grid-template-columns: 1fr; }
-  .hero-name             { font-size: clamp(2.8rem, 12vw, 4.5rem); }
+  section          { padding: 80px 0; }
+  .projects-grid   { grid-template-columns: 1fr; }
+  .skills-grid     { grid-template-columns: 1fr; }
+  .hero-name       { font-size: clamp(2.8rem, 12vw, 4.5rem); }
 }
 
 /* Very small — ≤420px: disable custom cursor */
 @media (max-width: 420px) {
-  body                   { cursor: auto; }
+  body             { cursor: auto; }
   #cursor-dot,
-  #cursor-ring           { display: none; }
+  #cursor-ring     { display: none; }
 }

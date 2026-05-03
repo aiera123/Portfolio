@@ -4,14 +4,16 @@
  * Modules (all self-contained, no external dependencies):
  *   1. Cursor       — custom dot + lagging ring cursor
  *   2. Navbar       — frosted-glass effect on scroll
- *   3. MobileMenu   — hamburger / drawer open & close
- *   4. ScrollReveal — fade-in elements when they enter the viewport
- *   5. SkillBars    — animate progress bars on scroll
- *   6. HeroChips    — staggered entrance for the tech chips
- *   7. ContactForm  — basic validation + mock send with toast
+ *   3. ThemeToggle  — light/dark mode with localStorage persistence
+ *   4. MobileMenu   — hamburger / drawer open & close
+ *   5. ScrollReveal — fade-in elements when they enter the viewport
+ *   6. SkillBars    — animate progress bars on scroll
+ *   7. HeroChips    — staggered entrance for the tech chips
+ *   8. ContactForm  — basic validation + mock send with toast
  */
 
 'use strict';
+
 
 /* ── 1. Cursor ─────────────────────────────────────────────────
    Two elements:
@@ -80,7 +82,100 @@ function initNavbar() {
 }
 
 
-/* ── 3. MobileMenu ─────────────────────────────────────────────
+/* ── 3. ThemeToggle ────────────────────────────────────────────
+   Strategy:
+   - Dark is the DEFAULT (no class on body, as defined in :root).
+   - Light mode is activated by adding class "light" to <body>.
+   - Choice is saved to localStorage under key "portfolio-theme".
+   - On load, we check:
+       1. localStorage value  (explicit user preference)
+       2. prefers-color-scheme  (system preference, first visit only)
+       3. Default to dark if neither is set.
+
+   The button icon communicates what clicking WILL DO:
+   - Shows 🌙 in dark mode  → "click to go light" (sun comes out)
+   - Shows ☀️ in light mode → "click to go dark"  (moon comes out)
+   ──────────────────────────────────────────────────────────── */
+function initThemeToggle() {
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
+
+  const STORAGE_KEY = 'portfolio-theme';
+  const DARK_ICON   = '🌙';
+  const LIGHT_ICON  = '☀️';
+
+  /**
+   * Apply a theme.
+   * @param {'dark'|'light'} theme
+   * @param {boolean} [persist=true] — whether to save to localStorage
+   */
+  function applyTheme(theme, persist = true) {
+    if (theme === 'light') {
+      document.body.classList.add('light');
+      btn.textContent          = LIGHT_ICON;
+      btn.setAttribute('aria-label', 'Switch to dark mode');
+      btn.setAttribute('title',      'Switch to dark mode');
+    } else {
+      document.body.classList.remove('light');
+      btn.textContent          = DARK_ICON;
+      btn.setAttribute('aria-label', 'Switch to light mode');
+      btn.setAttribute('title',      'Switch to light mode');
+    }
+
+    if (persist) {
+      try {
+        localStorage.setItem(STORAGE_KEY, theme);
+      } catch (e) {
+        // localStorage may be blocked in some private-browsing environments;
+        // silently swallow the error so nothing else breaks.
+      }
+    }
+  }
+
+  /** Toggle between light and dark. */
+  function toggleTheme() {
+    const isLight = document.body.classList.contains('light');
+    applyTheme(isLight ? 'dark' : 'light');
+  }
+
+  // ── Determine the initial theme ──────────────────────────────
+  let savedTheme = null;
+
+  try {
+    savedTheme = localStorage.getItem(STORAGE_KEY);
+  } catch (e) {
+    // Ignore localStorage errors
+  }
+
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    // 1. Explicit user preference
+    applyTheme(savedTheme, false); // already saved, no need to re-save
+  } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+    // 2. System prefers light, and user hasn't overridden yet
+    applyTheme('light', false);   // save lazily on first manual toggle
+  } else {
+    // 3. Default: dark (matches :root in CSS — no body class needed)
+    applyTheme('dark', false);
+  }
+
+  // Wire up the button
+  btn.addEventListener('click', toggleTheme);
+
+  // Optional: respond to live system-preference changes
+  // (only applies when the user hasn't explicitly chosen via the button)
+  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+    try {
+      if (!localStorage.getItem(STORAGE_KEY)) {
+        applyTheme(e.matches ? 'light' : 'dark', false);
+      }
+    } catch (_) {
+      // localStorage blocked
+    }
+  });
+}
+
+
+/* ── 4. MobileMenu ─────────────────────────────────────────────
    Toggles .open on both the hamburger button and the full-screen
    drawer. Locks body scroll while the drawer is open.
    Closes when any drawer link is clicked.
@@ -92,12 +187,14 @@ function initMobileMenu() {
 
   function openMenu() {
     ham.classList.add('open');
+    ham.setAttribute('aria-expanded', 'true');
     drawer.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
 
   function closeMenu() {
     ham.classList.remove('open');
+    ham.setAttribute('aria-expanded', 'false');
     drawer.classList.remove('open');
     document.body.style.overflow = '';
   }
@@ -115,7 +212,7 @@ function initMobileMenu() {
 }
 
 
-/* ── 4. ScrollReveal ───────────────────────────────────────────
+/* ── 5. ScrollReveal ───────────────────────────────────────────
    Uses IntersectionObserver to add .up to elements with
    .sr / .sr-left / .sr-right once they enter the viewport.
 
@@ -138,7 +235,7 @@ function initScrollReveal() {
 }
 
 
-/* ── 5. SkillBars ──────────────────────────────────────────────
+/* ── 6. SkillBars ──────────────────────────────────────────────
    Each .bar-fill has a data-w attribute (e.g. data-w="85").
    The bar width stays at 0 until the element scrolls into view,
    then CSS transition animates it to the target percentage.
@@ -160,7 +257,7 @@ function initSkillBars() {
 }
 
 
-/* ── 6. HeroChips ──────────────────────────────────────────────
+/* ── 7. HeroChips ──────────────────────────────────────────────
    Gives each tech chip in the hero card a staggered slide-up
    entrance. Delays increase by 80 ms per chip, starting at 600 ms.
    ──────────────────────────────────────────────────────────── */
@@ -168,15 +265,15 @@ function initHeroChips() {
   const chips = document.querySelectorAll('.chip');
   if (!chips.length) return;
 
-  const BASE_DELAY  = 0.6;   // seconds
-  const STEP_DELAY  = 0.08;  // seconds between chips
+  const BASE_DELAY = 0.6;   // seconds
+  const STEP_DELAY = 0.08;  // seconds between chips
 
   chips.forEach((chip, index) => {
     const delay = BASE_DELAY + index * STEP_DELAY;
 
     // Start hidden and offset downward
-    chip.style.opacity   = '0';
-    chip.style.transform = 'translateY(12px)';
+    chip.style.opacity    = '0';
+    chip.style.transform  = 'translateY(12px)';
     chip.style.transition = `opacity 0.5s ${delay}s ease, transform 0.5s ${delay}s ease`;
 
     // Trigger on next paint so the initial state is applied first
@@ -188,7 +285,7 @@ function initHeroChips() {
 }
 
 
-/* ── 7. ContactForm ────────────────────────────────────────────
+/* ── 8. ContactForm ────────────────────────────────────────────
    Validates name, email, and message fields.
    Simulates an async send (1.4 s delay) then shows a toast.
    Resets the form after 4 s.
@@ -226,18 +323,18 @@ function initContactForm() {
     }
 
     // Show loading state
-    btn.disabled   = true;
-    btn.innerHTML  = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
 
     // Simulate network delay — replace with real API call here
     setTimeout(() => {
-      btn.innerHTML        = '<i class="fa-solid fa-check"></i> Sent!';
-      toast.style.display  = 'block';
+      btn.innerHTML       = '<i class="fa-solid fa-check"></i> Sent!';
+      toast.style.display = 'block';
 
       // Reset after 4 s
       setTimeout(() => {
-        btn.disabled   = false;
-        btn.innerHTML  = '<i class="fa-solid fa-paper-plane"></i> Send Message';
+        btn.disabled        = false;
+        btn.innerHTML       = '<i class="fa-solid fa-paper-plane"></i> Send Message';
         toast.style.display = 'none';
         resetFields();
       }, 4000);
@@ -247,8 +344,14 @@ function initContactForm() {
 }
 
 
-/* ── Bootstrap: run all modules once the DOM is ready ────────── */
+/* ── Bootstrap ─────────────────────────────────────────────────
+   Run all modules once the DOM is fully parsed.
+   NOTE: initThemeToggle() is first so the correct theme class is
+   applied to <body> before any other module or paint occurs,
+   preventing a flash of the wrong theme (FOUT).
+   ──────────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
+  initThemeToggle();   // ← must be first to avoid theme flash
   initCursor();
   initNavbar();
   initMobileMenu();
